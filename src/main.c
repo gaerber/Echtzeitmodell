@@ -41,6 +41,7 @@
 #include "bsp_serial.h"
 
 /* Private macro */
+#define DUMMY
 /* Private variables */
 /* Private function prototypes */
 /* Private functions */
