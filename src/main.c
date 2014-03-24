@@ -84,14 +84,15 @@ int main(void) {
 	bsp_EngineEnalble();
 	bsp_EngineSpeedSet(brightness);
 
+	/* Enable all IRQ */
 	__enable_irq();
 
+	/* Small time delay */
 	for (i=0; i<0x3FFFFF; i++);
 	//EXTI_GenerateSWInterrupt(EXTI_Line7);
 
-	/* Send over UART */
+	/* Send over UART (only pend interrupt to start transmission) */
 	bspSerialTxIrqEnable();
-	//bsp_SerialSend(uart_string[char_ctr++]);
 
 	/* Infinite loop */
 	while (1) {
