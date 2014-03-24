@@ -1,12 +1,14 @@
 /**
- * \file        bsp_led.h
- * \brief       Alle LEDs.
+ * \file        bsp.h
+ * \brief       Board support package.
  * \date        2014-03-18
  * \version     0.1
  * \author		Kevin Gerber
  *
  * \addtogroup  bsp
- * \brief		???
+ * \brief		The board support package contains all medium layer functionality
+ * 				to use the hardware module. The BSP is based on the standard peripheral
+ * 				library from ST.
  * @{
  */
 
@@ -15,6 +17,11 @@
 
 #include "stm32f4xx.h"
 
+/**
+ * \brief	Assert makro.
+ * \param	cond	Conditions, which must be true.
+ * \todo	Define an assert function.
+ */
 #define assert(cond) //((cond)?(0): (fprintf (stderr, "assertion failed: \ %s, file %s, line %d \n",#cond,__FILE__,__LINE__), abort()))
 
 /**
@@ -28,9 +35,10 @@ typedef struct {
 	uint8_t fillup;
 } bsp_gpioconf_t;
 
+
 /**
  * \brief	Get the pin source from the pin number.
- * \author	Tobias Rüetschi
+ * \author	Tobias Rueetschi
  */
 #define BSP_GPIO_PIN_TO_SOURCE(GPIO_PIN)	(								\
 		((GPIO_PIN) & GPIO_Pin_0) ? GPIO_PinSource0 :	/* bit 0 is set? */	\
@@ -54,7 +62,7 @@ typedef struct {
 
 /**
  * \brief	Get the port source from the port number.
- * \author	Tobias Rüetschi
+ * \author	Tobias Rueetschi
  */
 #define BSP_GPIO_TO_EXTIPORT(GPIO_PORT)	(								\
 		(GPIO_PORT == GPIOA) ? EXTI_PortSourceGPIOA :	/* Port A? */		\
@@ -71,7 +79,7 @@ typedef struct {
 
 /**
  * \brief	Get the pin EXTI source from the pin number.
- * \author	Tobias Rüetschi
+ * \author	Tobias Rueetschi
  */
 #define BSP_GPIO_TO_EXTIPIN(GPIO_PIN)	(									\
 		((GPIO_PIN) & GPIO_Pin_0) ? EXTI_PinSource0 :	/* bit 0 is set? */	\
