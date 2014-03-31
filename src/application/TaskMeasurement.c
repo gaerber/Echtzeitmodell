@@ -9,10 +9,16 @@
  * @{
  */
 /* Includes ------------------------------------------------------------------*/
+/* standard libraries */
+#include <stdint.h>
+
 /* RTOS */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+
+/* BSP */
+#include "bsp_angenc.h"
 
 /* application */
 #include "inc/Systemstate.h"
@@ -23,6 +29,7 @@
 /* private define ------------------------------------------------------------*/
 /* private macro -------------------------------------------------------------*/
 /* private variables ---------------------------------------------------------*/
+QueueHandle_t gq_angle;
 /* private function prototypes -----------------------------------------------*/
 /* private functions ---------------------------------------------------------*/
 
@@ -51,8 +58,15 @@ static void taskMeasurement(void* pvParameters)
  */
 void taskMeasurementInit()
 {
+	/* create task */
 	xTaskCreate(taskMeasurement, MEASUREMENT_TASK_NAME,
 			MEASUREMENT_TASK_STACK_SIZE, NULL, MEASUREMENT_TASK_PRIORITY, NULL );
+
+	/* create queue with 16bit space per item */
+	gq_angle = xQueueCreate(MEASUREMENT_QUEUE_LENGTH, sizeof(uint16_t));
+
+	/* init BSP modules */
+	bsp_AngEncInit();
 }
 /**
  * @}

@@ -9,7 +9,7 @@
  * @{
  */
 /* Includes ------------------------------------------------------------------*/
-/* standard librarys */
+/* standard libraries */
 #include <stdint.h>
 
 /* application */

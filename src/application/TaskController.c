@@ -9,13 +9,20 @@
  * @{
  */
 /* Includes ------------------------------------------------------------------*/
+/* standard libraries */
+#include <stdint.h>
+
 /* RTOS */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 
+/* BSP */
+#include "bsp_led.h"
+
 /* application */
 #include "inc/Systemstate.h"
+#include "inc/TaskCommunicationRX.h" /*!< dependency for message queue */
 #include "inc/TaskController.h"
 
 /* private typedef -----------------------------------------------------------*/
@@ -54,8 +61,12 @@ static void taskController(void* pvParameters)
  */
 void taskControllerInit()
 {
+	/* create task */
 	xTaskCreate(taskController, CONTROLLER_TASK_NAME,
 			CONTROLLER_TASK_STACK_SIZE, NULL, CONTROLLER_TASK_PRIORITY, NULL );
+
+	/* init modules */
+	bsp_LedInit();
 }
 
 /**

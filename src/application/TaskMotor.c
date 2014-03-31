@@ -9,6 +9,19 @@
  * @{
  */
 /* Includes ------------------------------------------------------------------*/
+/* standard libraries */
+#include <stdint.h>
+
+/* RTOS */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+
+/* BSP */
+#include "bsp_engine.h"
+
+/* application */
+#include "inc/Systemstate.h"
 #include "inc/TaskMotor.h"
 
 /* private typedef -----------------------------------------------------------*/
@@ -17,7 +30,43 @@
 /* private variables ---------------------------------------------------------*/
 /* private function prototypes -----------------------------------------------*/
 /* private functions ---------------------------------------------------------*/
+
+/**
+ *	\fn		taskMotor
+ *	\brief	motor task
+ *
+ *	\param[in]	pvParameters	necessary data for the controller task
+ */
+static void taskMotor(void* pvParameters)
+{
+	/* local variables */
+	portTickType last_flash_time;
+
+	/* endless loop */
+	for(;;)
+	{
+
+
+		vTaskDelayUntil(&last_flash_time, MOTOR_SPEED_REFRESH_TIME/portTICK_RATE_MS);
+	}
+}
+
+
 /* public functions ----------------------------------------------------------*/
+
+/**
+ * \fn		taskMotorInit
+ * \brief	creates the motor task
+ */
+void taskMotorInit()
+{
+	/* create task */
+	xTaskCreate(taskMotor, MOTOR_TASK_NAME,
+			MOTOR_TASK_STACK_SIZE, NULL, MOTOR_TASK_PRIORITY, NULL );
+
+	/* init BSP modules */
+	bsp_EngineInit();
+}
 
 /**
  * @}

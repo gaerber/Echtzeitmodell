@@ -1,6 +1,6 @@
 /**
  * \file        Systemstate.h
- * \brief       gobal structure for system modules control
+ * \brief       global structure for system modules control
  * \date        2014-03-31
  * \version     0.0.1
  *

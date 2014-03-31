@@ -17,9 +17,17 @@
 #define COMMUNICATION_TX_TASK_PRIORITY		2
 #define COMMUNICATION_TX_TASK_NAME			"Task Communication TX"
 #define COMMUNICATION_TX_TASK_STACK_SIZE	configMINIMAL_STACK_SIZE
+
+
 /* exported macro ------------------------------------------------------------*/
+
+
 /* exported variables --------------------------------------------------------*/
+extern SemaphoreHandle_t gm_tx_rinbuffer;
+
+
 /* exported function prototypes ----------------------------------------------*/
+extern void taskCommunicationTXInit();
 
 
 

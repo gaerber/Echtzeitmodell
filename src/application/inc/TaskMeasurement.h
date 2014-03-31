@@ -16,6 +16,7 @@
 #define MEASUREMENT_TASK_PRIORITY	2
 #define MEASUREMENT_TASK_NAME		"Task Measurement"
 #define MEASUREMENT_TASK_STACK_SIZE	configMINIMAL_STACK_SIZE
+#define MEASUREMENT_QUEUE_LENGTH	10
 
 /* exported macro ------------------------------------------------------------*/
 /* exported variables --------------------------------------------------------*/
