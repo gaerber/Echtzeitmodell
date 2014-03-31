@@ -12,11 +12,22 @@
 #define TASKCONTROLLER_H_
 
 /* exported typedef ----------------------------------------------------------*/
-/* exported define -----------------------------------------------------------*/
-/* exported macro ------------------------------------------------------------*/
-/* exported variables --------------------------------------------------------*/
-/* exported function prototypes ----------------------------------------------*/
 
+
+/* exported define -----------------------------------------------------------*/
+#define CONTROLLER_TASK_PRIORITY	2
+#define CONTROLLER_TASK_NAME		"Task Controller"
+#define CONTROLLER_TASK_STACK_SIZE	configMINIMAL_STACK_SIZE
+
+
+/* exported macro ------------------------------------------------------------*/
+
+
+/* exported variables --------------------------------------------------------*/
+
+
+/* exported function prototypes ----------------------------------------------*/
+extern void taskControllerInit();
 
 
 #endif /* TASKCONTROLLER_H_ */

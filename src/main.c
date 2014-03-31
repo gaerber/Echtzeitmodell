@@ -1,28 +1,19 @@
 /**
-*****************************************************************************
-**
-**  File        : main.c
-**
-**  Abstract    : main function.
-**
-**  Functions   : main
-**
-**  Environment : Atollic TrueSTUDIO(R)
-**                STMicroelectronics STM32F4xx Standard Peripherals Library
-**
-**  Distribution: The file is distributed “as is,” without any warranty
-**                of any kind.
-**
-**  (c)Copyright Atollic AB.
-**  You may use this file as-is or modify it according to the needs of your
-**  project. This file may only be built (assembled or compiled and linked)
-**  using the Atollic TrueSTUDIO(R) product. The use of this file together
-**  with other tools than Atollic TrueSTUDIO(R) is not permitted.
-**
-*****************************************************************************
-*/
+ * \file        main.c
+ * \brief       initialisation of the different system modules
+ *
+ * \mainpage    Echtzeitmodell
+ * \authors     K. Gerber, S. Grossenbacher
+ * \date        2014-03-31
+ * \version     0.0.1
+ *
+ * \addtogroup  main
+ * \brief       main function
+ * @{
+ */
 
 /* Includes */
+
 /* RTOS */
 #include "FreeRTOS.h"
 #include "task.h"
@@ -39,6 +30,11 @@
 #include "bsp_angenc.h"
 #include "bsp_engine.h"
 #include "bsp_serial.h"
+
+/* application */
+#include "application/inc/Systemstate.h"
+#include "application/inc/TaskController.h"
+#include "application/inc/TaskMeasurement.h"
 
 /* Private macro */
 /* Private variables */
@@ -69,43 +65,34 @@ void bsp_SerialIrqRxHandler(void) {
 **===========================================================================
 */
 int main(void) {
-	volatile uint32_t i;
-	uint32_t brightness = 0;
+//	volatile uint32_t i;
+//	uint32_t brightness = 0;
 
 	/* Ensure all priority bits are assigned as preemption priority bits. */
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
-	bsp_LedInit();
-	bsp_AngEncInit();
-	bsp_EngineInit();
+//	bsp_LedInit();
+//	bsp_AngEncInit();
+//	bsp_EngineInit();
+//
+//	bsp_SerialInit();
+//
+//	bsp_EngineEnalble();
+//	bsp_EngineSpeedSet(brightness);
 
-	bsp_SerialInit();
-
-	bsp_EngineEnalble();
-	bsp_EngineSpeedSet(brightness);
-
-	/* Enable all IRQ */
-	__enable_irq();
-
-	/* Small time delay */
-	for (i=0; i<0x3FFFFF; i++);
-	//EXTI_GenerateSWInterrupt(EXTI_Line7);
 
 	/* Send over UART (only pend interrupt to start transmission) */
-	bspSerialTxIrqEnable();
+//	bspSerialTxIrqEnable();
+
+
+
+	/* module initialisations */
+	taskControllerInit();
+	taskMeasurementInit();
+
+	vTaskStartScheduler();
 
 	/* Infinite loop */
-	while (1) {
-		/* Set */
-		bsp_LedSetOn(BSP_LED_GREEN);
-		bsp_LedSetOn(BSP_LED_RED);
-		for (i=0; i<0x3FFFFF; i++);
-		/* Reset */
-		bsp_LedSetOff(BSP_LED_GREEN);
-		bsp_LedSetOff(BSP_LED_RED);
-		for (i=0; i<0x3FFFFF; i++);
+	for(;;);
 
-		bsp_EngineSpeedSet(brightness);
-		brightness += 10;
-	}
 }

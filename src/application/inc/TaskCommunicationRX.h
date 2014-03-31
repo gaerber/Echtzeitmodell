@@ -14,6 +14,9 @@
 
 /* exported typedef ----------------------------------------------------------*/
 /* exported define -----------------------------------------------------------*/
+#define COMMUNICATION_RX_TASK_PRIORITY		2
+#define COMMUNICATION_RX_TASK_NAME			"Task Communication RX"
+#define COMMUNICATION_RX_TASK_STACK_SIZE	configMINIMAL_STACK_SIZE
 /* exported macro ------------------------------------------------------------*/
 /* exported variables --------------------------------------------------------*/
 /* exported function prototypes ----------------------------------------------*/
