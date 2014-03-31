@@ -31,7 +31,7 @@ typedef enum {
 /** PWM frequency */
 #define BSP_ENGINE_PWM_FREQ				21000000
 /** Period register of the PWM. */
-#define BSP_ENGINE_PWM_PERIOD			665
+#define BSP_ENGINE_PWM_PERIOD			100
 
 /** RCC AHB peripheral of the timer port. */
 #define BSP_ENGINE_TIMER_PORT_PERIPH	RCC_APB1Periph_TIM5
