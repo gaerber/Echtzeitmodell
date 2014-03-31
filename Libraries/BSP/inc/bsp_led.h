@@ -16,6 +16,8 @@
 #ifndef BSP_LED_H_
 #define BSP_LED_H_
 
+#include "bsp.h"
+
 /** LED is in ON state. */
 #define BSP_LED_ON			1
 /** LED is in OFF state. */
