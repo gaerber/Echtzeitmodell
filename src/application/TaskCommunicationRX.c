@@ -52,16 +52,6 @@ static void taskCommunicationRX(void* pvParameters)
 	}
 }
 
-/**
- * \fn		bsp_SerialIrqRxHandler
- * \brief	serial receive IRQ callback function
- */
-void bsp_SerialIrqRxHandler(void)
-{
-//	uint16_t recv;
-//	bsp_SerialReceive(&recv);
-}
-
 
 /* public functions ----------------------------------------------------------*/
 

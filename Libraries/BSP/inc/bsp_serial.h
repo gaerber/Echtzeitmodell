@@ -42,7 +42,7 @@ static const bsp_gpioconf_t BSP_SERIAL_TX = {
 
 /* UART settings */
 #define BSP_SERIAL_UART_BAUD	115200				/*!< UART baud */
-#define BSP_SERIAL_UART_LENGTH	USART_WordLength_8b	/*!< UART word lngth */
+#define BSP_SERIAL_UART_LENGTH	USART_WordLength_8b	/*!< UART word length */
 #define BSP_SERIAL_UART_STOP	USART_StopBits_1	/*!< UART number of stop bits */
 #define BSP_SERIAL_UART_PARITY	USART_Parity_No		/*!< UART parity bit */
 #define BSP_SERIAL_UART_FLOW	USART_HardwareFlowControl_None	/*!< UART hardware flow control */

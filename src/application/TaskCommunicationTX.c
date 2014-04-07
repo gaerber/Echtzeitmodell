@@ -50,19 +50,6 @@ static void taskCommunicationTX(void* pvParameters)
 }
 
 
-/**
- * \fn		bsp_SerialIrqTxHandler
- * \brief	serial transmit IRQ callback function
- */
-void bsp_SerialIrqTxHandler(void)
-{
-
-//	bsp_SerialSend(uart_string[char_ctr++]);
-
-//	bspSerialTxIrqDisable();
-}
-
-
 /* public functions ----------------------------------------------------------*/
 
 /**

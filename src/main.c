@@ -46,11 +46,15 @@
 **
 **===========================================================================
 */
+#define d1 "hallo"
+#define d2 "welt"
+
 int main(void)
 {
 	/* Ensure all priority bits are assigned as preemption priority bits. */
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
+	char str[] = d1" " d2;
 
 	/* module initialisations */
 	taskControllerInit();
