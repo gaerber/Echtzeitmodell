@@ -21,6 +21,8 @@
 #ifndef BSP_SERIAL_H_
 #define BSP_SERIAL_H_
 
+#include "bsp.h"
+
 /** Hardware label from the UART RX pin */
 static const bsp_gpioconf_t BSP_SERIAL_RX = {
 		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_10, GPIO_AF_USART1

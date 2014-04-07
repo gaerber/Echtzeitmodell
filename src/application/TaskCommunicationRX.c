@@ -24,6 +24,8 @@
 #include "inc/TaskCommunicationTX.h" /*!< dependency for ringbuffer mutex */
 #include "inc/TaskCommunicationRX.h"
 
+#include "bsp_serial.h"
+
 /* private typedef -----------------------------------------------------------*/
 /* private define ------------------------------------------------------------*/
 /* private macro -------------------------------------------------------------*/
