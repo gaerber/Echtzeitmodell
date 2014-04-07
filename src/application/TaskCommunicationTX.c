@@ -16,6 +16,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "queue.h"
 
 /* application */
 #include "inc/Systemstate.h"
@@ -27,6 +28,7 @@
 /* private variables ---------------------------------------------------------*/
 SemaphoreHandle_t gm_tx_rinbuffer; /*!< mutex for tx ringbuffer access (for echo/
 									data scheduling) */
+QueueHandle_t gq_tx_message;
 
 /* private function prototypes -----------------------------------------------*/
 /* private functions ---------------------------------------------------------*/
@@ -72,6 +74,9 @@ void taskCommunicationTXInit()
 	/* create task */
 	xTaskCreate(taskCommunicationTX, COMMUNICATION_TX_TASK_NAME,
 			COMMUNICATION_TX_TASK_STACK_SIZE, NULL, COMMUNICATION_TX_TASK_PRIORITY, NULL );
+
+	/* create queue with 16 char space per item */
+	gq_tx_message = xQueueCreate(COMMUNICATION_TX_QUEUE_LENGHT, sizeof(char[16]));
 
 	/* create mutex */
 	gm_tx_rinbuffer = xSemaphoreCreateMutex();
