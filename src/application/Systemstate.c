@@ -24,6 +24,7 @@ systemstate_t g_systemstate =
 	.message = {0},
 	.speed = 0,
 	.flash_time = 0,
+	.comm_echo = 1,
 	.system_state = STATE_CONFIG
 };
 /* private function prototypes -----------------------------------------------*/

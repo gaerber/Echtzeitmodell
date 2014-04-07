@@ -45,8 +45,7 @@ static void taskMotor(void* pvParameters)
 	/* endless loop */
 	for(;;)
 	{
-
-
+		bsp_EngineSpeedSet(g_systemstate.speed);
 		vTaskDelayUntil(&last_flash_time, MOTOR_SPEED_REFRESH_TIME/portTICK_RATE_MS);
 	}
 }
@@ -66,6 +65,8 @@ void taskMotorInit()
 
 	/* init BSP modules */
 	bsp_EngineInit();
+	bsp_EngineSpeedSet(g_systemstate.speed);
+	bsp_EngineEnalble();
 }
 
 /**

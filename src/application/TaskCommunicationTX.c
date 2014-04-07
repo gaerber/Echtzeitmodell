@@ -22,6 +22,8 @@
 #include "inc/Systemstate.h"
 #include "inc/TaskCommunicationTX.h"
 
+#include "circularbuffer.h"
+
 /* private typedef -----------------------------------------------------------*/
 /* private define ------------------------------------------------------------*/
 /* private macro -------------------------------------------------------------*/
@@ -41,11 +43,28 @@ QueueHandle_t gq_tx_message;
  */
 static void taskCommunicationTX(void* pvParameters)
 {
+	char output[64];
+	char *ptr;
 
 	/* endless loop */
-	for(;;)
-	{
+	for (;;) {
+		/* Get the message, which has to be sent */
+		if (xQueueReceive(gq_tx_message, output, portMAX_DELAY) == pdTRUE) {
+			/* Gets the semaphore to write into the circular buffer */
+			xSemaphoreTake(gm_tx_rinbuffer, portMAX_DELAY);
 
+			/* Send the string to the TX output buffer */
+			ptr = output;
+			while (*ptr != '\0') {
+				while (!CircularBufferCharPut(*ptr)) {
+					/* No space available in the circular buffer */
+					vTaskDelay(10/portTICK_RATE_MS);
+				}
+			}
+
+			/* Release the semaphore */
+			xSemaphoreGive(gm_tx_rinbuffer);
+		}
 	}
 }
 
@@ -62,8 +81,8 @@ void taskCommunicationTXInit()
 	xTaskCreate(taskCommunicationTX, COMMUNICATION_TX_TASK_NAME,
 			COMMUNICATION_TX_TASK_STACK_SIZE, NULL, COMMUNICATION_TX_TASK_PRIORITY, NULL );
 
-	/* create queue with 16 char space per item */
-	gq_tx_message = xQueueCreate(COMMUNICATION_TX_QUEUE_LENGHT, sizeof(char[16]));
+	/* create queue with 64 char space per item */
+	gq_tx_message = xQueueCreate(COMMUNICATION_TX_QUEUE_LENGHT, sizeof(char[64]));
 
 	/* create mutex */
 	gm_tx_rinbuffer = xSemaphoreCreateMutex();
