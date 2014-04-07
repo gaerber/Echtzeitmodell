@@ -22,6 +22,7 @@
 /* application */
 #include "inc/Systemstate.h"
 #include "inc/TaskCommunicationTX.h" /*!< dependency for ringbuffer mutex */
+#include "inc/TaskController.h" /*!< dependency for message queue */
 #include "inc/TaskCommunicationRX.h"
 
 #include "bsp_serial.h"
@@ -30,7 +31,7 @@
 /* private define ------------------------------------------------------------*/
 /* private macro -------------------------------------------------------------*/
 /* private variables ---------------------------------------------------------*/
-QueueHandle_t gq_message;
+
 /* private function prototypes -----------------------------------------------*/
 /* private functions ---------------------------------------------------------*/
 /**
@@ -73,9 +74,6 @@ void taskCommunicationRXInit()
 	/* create task */
 	xTaskCreate(taskCommunicationRX, COMMUNICATION_RX_TASK_NAME,
 			COMMUNICATION_RX_TASK_STACK_SIZE, NULL, COMMUNICATION_RX_TASK_PRIORITY, NULL );
-
-	/* create queue with 16 char space per item */
-	gq_message = xQueueCreate(COMMUNICATION_RX_QUEUE_LENGHT, sizeof(char[16]));
 
 	/* init modules */
 	bsp_SerialInit();

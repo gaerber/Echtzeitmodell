@@ -18,12 +18,14 @@
 #define CONTROLLER_TASK_PRIORITY	2
 #define CONTROLLER_TASK_NAME		"Task Controller"
 #define CONTROLLER_TASK_STACK_SIZE	configMINIMAL_STACK_SIZE
+#define CONTROLLER_QUEUE_LENGHT			10
 
 
 /* exported macro ------------------------------------------------------------*/
 
 
 /* exported variables --------------------------------------------------------*/
+extern QueueHandle_t gq_message;
 
 
 /* exported function prototypes ----------------------------------------------*/

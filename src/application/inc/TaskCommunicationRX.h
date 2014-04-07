@@ -17,7 +17,6 @@
 #define COMMUNICATION_RX_TASK_PRIORITY			2
 #define COMMUNICATION_RX_TASK_NAME				"Task Communication RX"
 #define COMMUNICATION_RX_TASK_STACK_SIZE		configMINIMAL_STACK_SIZE
-#define COMMUNICATION_RX_QUEUE_LENGHT			10
 #define COMMUNICATION_RX_BUFFER_READOUT_TIME 	20 /*!< time in [ms] */
 
 
@@ -25,7 +24,7 @@
 
 
 /* exported variables --------------------------------------------------------*/
-extern QueueHandle_t gq_message;
+
 
 /* exported function prototypes ----------------------------------------------*/
 extern void taskCommunicationRXInit();

@@ -22,14 +22,15 @@
 
 /* application */
 #include "inc/Systemstate.h"
-#include "inc/TaskCommunicationRX.h" /*!< dependency for message queue */
 #include "inc/TaskController.h"
 
 /* private typedef -----------------------------------------------------------*/
 /* private define ------------------------------------------------------------*/
+
+
 /* private macro -------------------------------------------------------------*/
 /* private variables ---------------------------------------------------------*/
-
+QueueHandle_t gq_message;
 
 /* private function prototypes -----------------------------------------------*/
 
@@ -64,6 +65,9 @@ void taskControllerInit()
 	/* create task */
 	xTaskCreate(taskController, CONTROLLER_TASK_NAME,
 			CONTROLLER_TASK_STACK_SIZE, NULL, CONTROLLER_TASK_PRIORITY, NULL );
+
+	/* create queue with 16 char space per item */
+	gq_message = xQueueCreate(CONTROLLER_QUEUE_LENGHT, sizeof(char[16]));
 
 	/* init modules */
 	bsp_LedInit();
