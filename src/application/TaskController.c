@@ -19,6 +19,7 @@
 
 /* BSP */
 #include "bsp_led.h"
+#include "bsp_gp22.h"
 
 /* application */
 #include "inc/Systemstate.h"
@@ -131,6 +132,9 @@ void taskControllerInit()
 
 	/* init modules */
 	bsp_LedInit();
+	bsp_GP22Init();
+
+	bsp_GP22SendOpcode(0xFF);
 }
 
 uint8_t firstLevelFilter(char* msg, void* level_func, command_t* command)

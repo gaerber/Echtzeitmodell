@@ -19,6 +19,7 @@
 
 /* BSP */
 #include "bsp_engine.h"
+#include "bsp_angenc.h"
 
 /* application */
 #include "inc/Systemstate.h"
@@ -64,7 +65,9 @@ void taskMotorInit()
 			MOTOR_TASK_STACK_SIZE, NULL, MOTOR_TASK_PRIORITY, NULL );
 
 	/* init BSP modules */
+	bsp_AngEncInit();
 	bsp_EngineInit();
+
 	bsp_EngineSpeedSet(g_systemstate.speed);
 	bsp_EngineEnalble();
 }

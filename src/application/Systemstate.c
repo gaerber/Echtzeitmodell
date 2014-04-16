@@ -21,8 +21,8 @@
 /* private variables ---------------------------------------------------------*/
 systemstate_t g_systemstate =
 {
-	.message = {0},
-	.speed = 0,
+	.message = "kevin !",
+	.speed = 100,
 	.flash_time = 0,
 	.comm_echo = 1,
 	.system_state = STATE_CONFIG
