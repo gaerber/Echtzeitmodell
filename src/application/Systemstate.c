@@ -25,7 +25,7 @@ systemstate_t g_systemstate =
 	.speed = 100,
 	.flash_time = 0,
 	.comm_echo = 1,
-	.system_state = STATE_CONFIG
+	.comm_respmsg = 1
 };
 /* private function prototypes -----------------------------------------------*/
 /* private functions ---------------------------------------------------------*/

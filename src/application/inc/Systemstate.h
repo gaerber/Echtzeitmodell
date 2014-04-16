@@ -20,15 +20,14 @@ typedef struct
 	char message[16];		/*!< rx message*/
 	uint8_t speed;			/*!< motor speed from 0...100%*/
 	uint16_t flash_time;	/*!< */
-	uint8_t comm_echo;		/*!< UART communication echo */
-	enum
-	{
-		STATE_CONFIG = 0,	/*!< system is in the config-state*/
-		STATE_RUN			/*!< system runs -> text is visible*/
-	}system_state;
+	uint8_t comm_echo;
+	uint8_t comm_respmsg;
 }systemstate_t;
 
 /* exported define -----------------------------------------------------------*/
+#define ON 1
+#define OFF 0
+
 /* exported macro ------------------------------------------------------------*/
 /* exported variables --------------------------------------------------------*/
 extern systemstate_t g_systemstate;
