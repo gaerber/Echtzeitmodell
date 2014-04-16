@@ -51,19 +51,19 @@ static void taskCommunicationTX(void* pvParameters)
 		/* Get the message, which has to be sent */
 		if (xQueueReceive(gq_tx_message, output, portMAX_DELAY) == pdTRUE) {
 			/* Gets the semaphore to write into the circular buffer */
-			xSemaphoreTake(gm_tx_rinbuffer, portMAX_DELAY);
+			//xSemaphoreTake(gm_tx_rinbuffer, portMAX_DELAY);
 
 			/* Send the string to the TX output buffer */
 			ptr = output;
 			while (*ptr != '\0') {
-				while (!CircularBufferCharPut(*ptr)) {
+				while (!CircularBufferCharPut(*ptr++)) {
 					/* No space available in the circular buffer */
 					vTaskDelay(10/portTICK_RATE_MS);
 				}
 			}
 
 			/* Release the semaphore */
-			xSemaphoreGive(gm_tx_rinbuffer);
+			//xSemaphoreGive(gm_tx_rinbuffer);
 		}
 	}
 }

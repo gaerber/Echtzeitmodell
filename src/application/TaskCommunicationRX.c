@@ -54,13 +54,12 @@ static void taskCommunicationRX(void* pvParameters)
 		write_index = 0;
 		command_complete = 0;
 
-		/* Receive data */
-		xSemaphoreTake(gm_tx_rinbuffer, portMAX_DELAY);
-
 		do {
 			if (CircularBufferCharGet(&(command[write_index]))) {
 				/* Character echo */
 				if (g_systemstate.comm_echo) {
+					/* Receive data */
+					//xSemaphoreTake(gm_tx_rinbuffer, portMAX_DELAY);
 					/* Puts the echo */
 					while (!CircularBufferCharPut(command[write_index])) {
 						vTaskDelay(10/portTICK_RATE_MS);
@@ -94,7 +93,7 @@ static void taskCommunicationRX(void* pvParameters)
 		while (command_complete == 0);
 
 		/* Release the semaphore */
-		xSemaphoreGive(gm_tx_rinbuffer);
+		//xSemaphoreGive(gm_tx_rinbuffer);
 
 		/* Send the received command to the controller task */
 		xQueueSend(gp_rx_message, command, portMAX_DELAY);

@@ -56,7 +56,7 @@ int main(void)
 
 	char str[] = d1" " d2;
 
-	/* module initialisations */
+	/* module initializations */
 	taskControllerInit();
 	taskMeasurementInit();
 	taskMotorInit();

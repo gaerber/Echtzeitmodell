@@ -105,7 +105,7 @@ void handlerBright(command_param_t*);
 static void taskController(void* pvParameters)
 {
 	/* local variables */
-	char rx_message[MESSAGES_MAX_LENGTH] ="set comm echo on";
+	char rx_message[MESSAGES_MAX_LENGTH];// ="set comm echo on";
 	char* start_ptr;
 	command_t command_handler;
 	msg_filter_t filter_handler;
@@ -117,7 +117,7 @@ static void taskController(void* pvParameters)
 		filter_handler = firstLevelFilter;
 
 		/* wait until a message is received */
-		//if(xQueueReceive(gp_rx_message,rx_message,portMAX_DELAY) == pdTRUE) TODO
+		if(xQueueReceive(gp_rx_message,rx_message,portMAX_DELAY) == pdTRUE)
 		{
 			start_ptr = &rx_message[0]; /* prevent null-pointer */
 			do
@@ -453,12 +453,12 @@ uint8_t fourdLevelSetCommEchoFilter(char** msg, void** level_func, command_t* co
 {
 	/* local variables */
 
-	if(checkCommand(&msg,"on",sizeof("on")))
+	if(strcmp(*msg,"on") == 0)
 	{
 		command->func = handlerEcho;
 		command->param.echo = 1;
 	}
-	else if(checkCommand(&msg,"off",sizeof("off")))
+	else if(strcmp(*msg,"off") == 0)
 	{
 		command->func = handlerEcho;
 		command->param.echo = 0;
@@ -544,7 +544,9 @@ void handlerError(command_param_t* param)
 
 void handlerEcho(command_param_t* param)
 {
-	char str[] = ERROR_ACK_STR_CODE" " ERROR_ACK_MSG;
+	char str[] = ERROR_ACK_STR_CODE" " ERROR_ACK_MSG"\r\n";
+
+	g_systemstate.comm_echo = param->echo;
 
 	if(g_systemstate.comm_respmsg)
 	{
