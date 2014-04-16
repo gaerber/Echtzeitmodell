@@ -25,12 +25,12 @@
 
 /** Hardware label from the UART RX pin */
 static const bsp_gpioconf_t BSP_SERIAL_RX = {
-		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_10, GPIO_AF_USART1
+		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_10, GPIO_Mode_AF, GPIO_PuPd_UP, GPIO_AF_USART1
 };
 
 /** Hardware label from the UART TX pin */
 static const bsp_gpioconf_t BSP_SERIAL_TX = {
-		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_9, GPIO_AF_USART1
+		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_9, GPIO_Mode_AF, GPIO_PuPd_UP, GPIO_AF_USART1
 };
 
 #define BSP_SERIAL_PORT			USART1					/*!< Port base address of the UART port */
@@ -51,8 +51,8 @@ static const bsp_gpioconf_t BSP_SERIAL_TX = {
 extern void bsp_SerialInit(void);
 extern void bsp_SerialSend(uint16_t data);
 extern void bsp_SerialReceive(uint16_t *data);
-extern void bspSerialTxIrqEnable(void);
-extern void bspSerialTxIrqDisable(void);
+extern void bsp_SerialTxIrqEnable(void);
+extern void bsp_SerialTxIrqDisable(void);
 
 #endif /* BSP_SERIAL_H_ */
 

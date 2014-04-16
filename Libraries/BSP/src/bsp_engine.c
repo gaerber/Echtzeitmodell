@@ -15,29 +15,16 @@
 #include "bsp_engine.h"
 
 /**
- * \brief
+ * \brief	Initialize the dc-engine. It is used one PWM channel to set the engine speed.
  */
 void bsp_EngineInit(void) {
-	GPIO_InitTypeDef GPIO_InitStructure;
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_OCInitTypeDef TIM_OCInitStructure;
 
 	uint16_t PrescalerValue;
 
-	/* GPIO clock enable */
-	RCC_AHB1PeriphClockCmd(BSP_ENGINE_PORT.periph, ENABLE);
-
-	/* GPIO Configuration in alternate function mode */
-	GPIO_InitStructure.GPIO_Pin = BSP_ENGINE_PORT.pin;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
-	GPIO_Init(BSP_ENGINE_PORT.base, &GPIO_InitStructure);
-
-	/* Connect the alternate function to the pin */
-	GPIO_PinAFConfig(BSP_ENGINE_PORT.base,
-			BSP_GPIO_PIN_TO_SOURCE(BSP_ENGINE_PORT.pin), BSP_ENGINE_PORT.af);
+	/* Initialize all GPIOs in their function */
+	bsg_GpioInit(&BSP_ENGINE_PORT);
 
 	/* TIM clock enable */
 	RCC_APB1PeriphClockCmd(BSP_ENGINE_TIMER_PORT_PERIPH, ENABLE);
@@ -112,18 +99,20 @@ void bsp_EngineDisable(void) {
  * \brief	Changes the engine speed by update the duty cycle of the PWM output.
  * \note	To get more performance the standard peripheral library is not used.
  * \param	speed	New speed of the engine. Equivalent to the duty cycle of the PWM.
- * It must be smaller than the period register, which is configured in \var BSP_ENGINE_PWM_PERIOD.
+ * 			It must be smaller than the period register, which is configured in
+ * 			\var BSP_ENGINE_PWM_PERIOD.
+ * \bug		CCRx Register: x is the channel number!
  */
 void bsp_EngineSpeedSet(uint32_t speed) {
 	/* Set the Capture Compare Register value */
-	BSP_ENGINE_TIMER_PORT_BASE->CCR1 = (speed % BSP_ENGINE_PWM_PERIOD);
+	BSP_ENGINE_TIMER_PORT_BASE->CCR4 = (speed % BSP_ENGINE_PWM_PERIOD);
 }
 
 /**
- * \todo	Checl if the CCR register is readable!
+ * \todo	Check if the CCR register is readable!
  */
 void bsp_EngineSpeedGet(uint32_t *speed) {
-	*speed = BSP_ENGINE_TIMER_PORT_BASE->CCR1;
+	*speed = BSP_ENGINE_TIMER_PORT_BASE->CCR4;
 }
 
 /**

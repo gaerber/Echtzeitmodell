@@ -1,8 +1,8 @@
 /**
  * \file        bsp.h
  * \brief       Board support package.
- * \date        2014-03-18
- * \version     0.1
+ * \date        2014-04-15
+ * \version     0.2
  * \author		Kevin Gerber
  *
  * \addtogroup  bsp
@@ -24,6 +24,7 @@
  */
 #define assert(cond) //((cond)?(0): (fprintf (stderr, "assertion failed: \ %s, file %s, line %d \n",#cond,__FILE__,__LINE__), abort()))
 
+
 /**
  * \brief	Structure of all important hardware configuration off each led.
  */
@@ -31,8 +32,9 @@ typedef struct {
 	uint32_t periph;		/*!< RCC AHB peripheral of the port. */
 	GPIO_TypeDef *base;		/*!< Port base address of the port. */
 	uint16_t pin;			/*!< GPIO number of the LED. */
+	GPIOMode_TypeDef mode;	/*!< GPIO mode */
+	GPIOPuPd_TypeDef pupd;	/*!< GPIO pull up / pull down mode */
 	uint8_t af;				/*!< GPIO alternate function */
-	uint8_t fillup;
 } bsp_gpioconf_t;
 
 
@@ -99,6 +101,9 @@ typedef struct {
 		((GPIO_PIN) & GPIO_Pin_14) ? EXTI_PinSource14 :	/* bit 14 is set? */\
 		((GPIO_PIN) & GPIO_Pin_15) ? EXTI_PinSource15 :	/* bit 15 is set? */\
 		-1)												/* no bits are set */
+
+
+extern void bsg_GpioInit(const bsp_gpioconf_t *port);
 
 
 #endif /* BSP_H_ */
