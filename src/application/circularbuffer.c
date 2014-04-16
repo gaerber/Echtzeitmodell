@@ -13,14 +13,14 @@
 
 /*
 * -----------------------------------------------------------------------
-* private variables
+* Private variables
 * -----------------------------------------------------------------------
 */
 
 /**
  * \brief	Circular buffer manager.
  */
-circbuff_t g_CircularBuffer;
+static circbuff_t g_CircularBuffer;
 
 /*
 * -----------------------------------------------------------------------
@@ -42,7 +42,7 @@ void bsp_SerialIrqTxHandler(void) {
 		/* There are no more character to send */
 		g_CircularBuffer.tx_sending = 0;
 		/* Disable the TX interrupt */
-		bspSerialTxIrqDisable();
+		bsp_SerialTxIrqDisable();
 	}
 }
 
@@ -60,7 +60,7 @@ void bsp_SerialIrqRxHandler(void) {
 		/* Store the incoming character in the circular buffer */
 		g_CircularBuffer.rx_buffer[g_CircularBuffer.rx_write++ & (RX_BUFFER_LEN-1)] = (char) c;
 	}
-	/* Else: If no space is available, the character will be losing */
+	/* Else: If no space is available, the character will be lost */
 }
 
 
@@ -88,7 +88,7 @@ void CircularBufferInit(void) {
  * \return	True if the character was put into the circular buffer, otherwise false.
  */
 uint8_t CircularBufferCharPut(char a) {
-	uint8_t success = 1;
+	uint8_t success = 0;
 
 	/* Check if space is available in the circular buffer */
 	if (g_CircularBuffer.tx_read + (TX_BUFFER_LEN - 2) != g_CircularBuffer.tx_write) {
@@ -100,12 +100,9 @@ uint8_t CircularBufferCharPut(char a) {
 		 * to start the transmission */
 		if (g_CircularBuffer.tx_sending == 0) {
 			/* Enable the TX interrupt */
-			bspSerialTxIrqEnable();
+			bsp_SerialTxIrqEnable();
 		}
 		success = 1;
-	}
-	else {
-		success = 0;
 	}
 
 	return success;
@@ -117,7 +114,7 @@ uint8_t CircularBufferCharPut(char a) {
  * \return	False if no character is available in the circular buffer.
  */
 uint8_t CircularBufferCharGet(char *a) {
-	uint8_t success;
+	uint8_t success = 0;
 
 	/* Checks if a character is available */
 	if (g_CircularBuffer.rx_read != g_CircularBuffer.rx_write) {
@@ -125,11 +122,30 @@ uint8_t CircularBufferCharGet(char *a) {
 		*a = g_CircularBuffer.rx_buffer[g_CircularBuffer.rx_read++ & (RX_BUFFER_LEN-1)];
 		success = 1;
 	}
-	else {
-		success = 0;
-	}
 
 	return success;
+}
+
+/**
+ * \brief	Puts a string into the circular buffer.
+ * \param	string is a pointer of the char array.
+ * \param	length is the length of the string, who will be sent.
+ * \return	The number of character, which were placed successfully in the circular buffer.
+ */
+uint32_t CircularBufferStringPut(char *string, uint32_t length) {
+	uint8_t success = 1;
+	uint32_t sendet_char;
+
+	for (sendet_char=0; success==1 && sendet_char<length; sendet_char++) {
+		success = CircularBufferCharPut(string[sendet_char]);
+	}
+
+	/* Correction if no space was aviable */
+	if (success == 0) {
+		sendet_char--;
+	}
+
+	return sendet_char;
 }
 
 #if 0

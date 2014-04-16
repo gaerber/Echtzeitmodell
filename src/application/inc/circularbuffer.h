@@ -53,5 +53,6 @@ typedef struct {
 extern void CircularBufferInit(void);
 extern uint8_t CircularBufferCharPut(char a);
 extern uint8_t CircularBufferCharGet(char *a);
+extern uint32_t CircularBufferStringPut(char *string, uint32_t length);
 
 #endif /* CIRCULARBUFFER_H_ */
