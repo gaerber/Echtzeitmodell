@@ -54,6 +54,7 @@ void bsp_SPIIrqRxHandler(void) {
 			g_SpiElement.irq_callback_handler(temp);
 		}
 		g_SpiElement.pending = 0;
+		bsp_SPIChipDeselect(BSP_SPI_CS_GP22);
 	}
 }
 
@@ -68,9 +69,9 @@ void bsp_SPIIrqTxHandler(void) {
 	}
 	else {
 		/* Transmission finished */
-		bsp_GP22ChipDeselect();
+		//bsp_GP22ChipDeselect();
 		if (spi_Get(&g_SpiElement)) {
-			bsp_GP22ChipSelect();
+			bsp_SPIChipSelect(BSP_SPI_CS_GP22);
 			bsp_SPISend((uint8_t) g_SpiElement.data[g_SpiElement.send_ptr++]);
 		}
 		else {

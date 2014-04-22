@@ -19,9 +19,9 @@
 #include "bsp.h"
 
 /** LED is in ON state. */
-#define BSP_LED_ON			1
+//#define BSP_LED_ON			1
 /** LED is in OFF state. */
-#define BSP_LED_OFF			0
+//#define BSP_LED_OFF			0
 
 /**
  * \brief		List off all LEDs to use in software.

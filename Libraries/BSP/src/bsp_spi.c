@@ -12,8 +12,13 @@
  * @{
  */
 
+#include <string.h>
+
 #include "bsp.h"
 #include "bsp_spi.h"
+
+//////// Local Variable
+static spi_circbuff_t g_CircularBuffer;
 
 extern void bsp_SPIIrqRxHandler(void);
 extern void bsp_SPIIrqTxHandler(void);
@@ -24,12 +29,17 @@ extern void bsp_SPIIrqTxHandler(void);
 void BSP_SPI_IRQ_Handler(void) {
 	/* SPI receive data register not empty */
 	if(SPI_I2S_GetFlagStatus(BSP_SPI_PORT, SPI_I2S_FLAG_RXNE) == SET) {
-		bsp_SPIIrqRxHandler();
+		//bsp_SPIIrqRxHandler();
 	}
 
 	/* SPI transmit data register is empty */
 	if(SPI_I2S_GetFlagStatus(BSP_SPI_PORT, SPI_I2S_FLAG_TXE) == SET) {
-		bsp_SPIIrqTxHandler();
+		//bsp_SPIIrqTxHandler();
+	}
+
+	/* SPI bus is not busy anymore */
+	if(SPI_I2S_GetFlagStatus(BSP_SPI_PORT, SPI_I2S_FLAG_BSY) == SET) {
+		bsp_SPIChipDeselect(BSP_SPI_CS_GP22);
 	}
 }
 
@@ -41,10 +51,14 @@ void bsp_SPIInit(void) {
 	SPI_InitTypeDef SPI_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 
-	/* Configure the chip select */
-	bsg_GpioInit(&BSP_SPI_CS_GP22);
-	/* Chip must be deselected */
-	bsp_GP22ChipDeselect();
+	/* Initialize all registred chip selects */
+	for (i=0; i < BSP_SPI_CS_ELEMENTCTR; i++) {
+		/* Initialize all GPIOs in their function */
+		bsg_GpioInit(&(BSP_SPI_CS[i]));
+
+		/* Chip must be deselected */
+		bsp_SPIChipDeselect(i);
+	}
 
 	/* SPI GPIO configuration */
 	for (i=0; i<3; i++) {
@@ -96,15 +110,17 @@ void bsp_SPIInit(void) {
 /**
  * \brief	Select the GP22 chip.
  */
-void bsp_GP22ChipSelect(void) {
-	GPIO_ResetBits(BSP_SPI_CS_GP22.base, BSP_SPI_CS_GP22.pin);
+void bsp_SPIChipSelect(bsp_spics_t chip) {
+	//GPIO_WriteBit(BSP_SPI_CS_GP22.base,BSP_SPI_CS_GP22.pin,RESET);
+	GPIO_ResetBits(BSP_SPI_CS[chip].base, BSP_SPI_CS[chip].pin);
 }
 
 /**
  * \brief	Deselect the GP22 chip.
  */
-void bsp_GP22ChipDeselect(void) {
-	GPIO_SetBits(BSP_SPI_CS_GP22.base, BSP_SPI_CS_GP22.pin);
+void bsp_SPIChipDeselect(bsp_spics_t chip) {
+	//GPIO_WriteBit(BSP_SPI_CS_GP22.base,BSP_SPI_CS_GP22.pin,SET);
+	GPIO_SetBits(BSP_SPI_CS[chip].base, BSP_SPI_CS[chip].pin);
 }
 
 
@@ -112,7 +128,7 @@ void bsp_GP22ChipDeselect(void) {
  * \brief		Transmit a single byte over the SPI.
  * \param[in]	data Byte to transmit.
  */
-void bsp_SPISend(uint16_t data) {
+void bsp_SPISendByte(uint16_t data) {
 	SPI_I2S_SendData(BSP_SPI_PORT, (data&0xFF));
 }
 
@@ -120,7 +136,7 @@ void bsp_SPISend(uint16_t data) {
  * \brief		Receive a single byte from the SPI.
  * \param[out]	data Received byte.
  */
-void bsp_SPIReceive(uint16_t *data) {
+void bsp_SPIReceiveByte(uint16_t *data) {
 	*data = (SPI_I2S_ReceiveData(BSP_SPI_PORT) & 0xFF);
 }
 
@@ -138,6 +154,40 @@ void bsp_SPITxIrqEnable(void) {
  */
 void bsp_SPITxIrqDisable(void) {
 	SPI_I2S_ITConfig(BSP_SPI_PORT, SPI_I2S_IT_TXE, DISABLE);
+}
+
+uint8_t bsp_SPITransmit(bsp_spics_t chip, uint8_t *data, uint8_t len, bsp_spicallback_t calback) {
+	uint8_t success = 0;
+	spitrans_t element;
+
+	/* Parameter check */
+	assert(chip < BSP_SPI_CS_ELEMENTCTR);
+	assert(len <= BSP_SPI_BUFSIZE_DATA);
+
+	/* Check if space is available in the circular buffer */
+	if (g_CircularBuffer.read + (BSP_SPI_BUFFER_LEN - 2) != g_CircularBuffer.write) {
+
+		/* Prepare the element */
+		element.chip = chip;
+		element.send_ptr = 0;
+		element.receive_prt = 0;
+		memcpy(element.data, data, len * sizeof(uint8_t));
+		element.size = len;
+		element.callback = calback;
+
+		/* Put the character into the circular buffer */
+		g_CircularBuffer.buffer[g_CircularBuffer.write++ & (BSP_SPI_BUFFER_LEN-1)] = element;
+
+		/* If the circular buffer is not sending, the TX interrupt must be enabled
+		 * to start the transmission */
+		if (g_CircularBuffer.sending == 0) {
+			/* Enable the TX interrupt */
+			bsp_SPITxIrqEnable();
+		}
+		success = 1;
+	}
+
+	return success;
 }
 
 /**
