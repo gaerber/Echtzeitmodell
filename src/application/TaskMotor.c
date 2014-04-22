@@ -29,6 +29,8 @@
 /* private define ------------------------------------------------------------*/
 /* private macro -------------------------------------------------------------*/
 /* private variables ---------------------------------------------------------*/
+QueueHandle_t gq_motor_speed;
+
 /* private function prototypes -----------------------------------------------*/
 /* private functions ---------------------------------------------------------*/
 
@@ -41,13 +43,14 @@
 static void taskMotor(void* pvParameters)
 {
 	/* local variables */
-	portTickType last_flash_time;
+	uint8_t new_speed;
 
 	/* endless loop */
 	for(;;)
 	{
-		bsp_EngineSpeedSet(g_systemstate.speed);
-		vTaskDelayUntil(&last_flash_time, MOTOR_SPEED_REFRESH_TIME/portTICK_RATE_MS);
+		if (xQueueReceive(gq_motor_speed, &new_speed, portMAX_DELAY) == pdTRUE) {
+			bsp_EngineSpeedSet(new_speed);
+		}
 	}
 }
 
@@ -63,6 +66,9 @@ void taskMotorInit()
 	/* create task */
 	xTaskCreate(taskMotor, MOTOR_TASK_NAME,
 			MOTOR_TASK_STACK_SIZE, NULL, MOTOR_TASK_PRIORITY, NULL );
+
+	/* create queue with engine speed */
+	gq_motor_speed = xQueueCreate(MOTOR_SPEED_QUEUE_LENGHT, sizeof(uint8_t));
 
 	/* init BSP modules */
 	bsp_AngEncInit();

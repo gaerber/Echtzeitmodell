@@ -33,6 +33,7 @@
 
 /**
  * \brief	Circular buffer structure.
+ * \note	Should be a static data type!
  */
 typedef struct {
 	uint32_t tx_read;				/*!< TX buffer start index (reading) */

@@ -51,7 +51,7 @@ static void taskCommunicationTX(void* pvParameters)
 		/* Get the message, which has to be sent */
 		if (xQueueReceive(gq_tx_message, output, portMAX_DELAY) == pdTRUE) {
 			/* Gets the semaphore to write into the circular buffer */
-			//xSemaphoreTake(gm_tx_rinbuffer, portMAX_DELAY);
+			xSemaphoreTake(gm_tx_rinbuffer, portMAX_DELAY);
 
 			/* Send the string to the TX output buffer */
 			ptr = output;
@@ -63,7 +63,7 @@ static void taskCommunicationTX(void* pvParameters)
 			}
 
 			/* Release the semaphore */
-			//xSemaphoreGive(gm_tx_rinbuffer);
+			xSemaphoreGive(gm_tx_rinbuffer);
 		}
 	}
 }
@@ -86,6 +86,7 @@ void taskCommunicationTXInit()
 
 	/* create mutex */
 	gm_tx_rinbuffer = xSemaphoreCreateMutex();
+	xSemaphoreGive(gm_tx_rinbuffer);
 }
 
 

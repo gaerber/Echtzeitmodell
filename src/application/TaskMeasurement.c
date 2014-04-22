@@ -30,7 +30,7 @@
 /* private define ------------------------------------------------------------*/
 /* private macro -------------------------------------------------------------*/
 /* private variables ---------------------------------------------------------*/
-QueueHandle_t gq_angle;
+QueueHandle_t gq_message;
 /* private function prototypes -----------------------------------------------*/
 /* private functions ---------------------------------------------------------*/
 
@@ -89,21 +89,33 @@ static void taskMeasurement(void* pvParameters)
 	/* endless loop */
 	for(;;)
 	{
-		/* Get the string */
-		strcpy(message, g_systemstate.message);
-
-		/* Show the hole string */
-		letter = 0;
-		while (message[letter] != '\0') {
-			letter_pos = convertChar2Pos(message[letter]);
-			if (letter_pos > 0) {
-				bsp_AngEncPos(letter_pos);
-			}
-
-			letter++;
-
-			vTaskDelay(500);
+		/* Get new string if available (non blocked) */
+		if (xQueueReceive(gq_message, message, 0) == pdTRUE) {
+			letter = 0;
 		}
+
+		/* Restart the string */
+		if (message[letter] == '\0') {
+			letter = 0;
+		}
+
+		/* Short delay in front of each string */
+		vTaskDelay(600);
+
+		/* Show the next char */
+		letter_pos = convertChar2Pos(message[letter]);
+		if (letter_pos > 0) {
+			bsp_AngEncPos(letter_pos);
+		}
+
+		/* Show the letter for 500ms */
+		vTaskDelay(500);
+
+		/* Make a Short break with a empty screen */
+		vTaskDelay(100);
+
+		/* Next letter */
+		letter++;
 	}
 }
 
@@ -120,11 +132,8 @@ void taskMeasurementInit()
 	xTaskCreate(taskMeasurement, MEASUREMENT_TASK_NAME,
 			MEASUREMENT_TASK_STACK_SIZE, NULL, MEASUREMENT_TASK_PRIORITY, NULL );
 
-	/* create queue with 16bit space per item */
-	gq_angle = xQueueCreate(MEASUREMENT_QUEUE_LENGTH, sizeof(uint16_t));
-
-	/* init BSP modules */
-	bsp_AngEncInit();
+	/* create queue per item */
+	gq_message = xQueueCreate(MEASUREMENT_QUEUE_LENGTH, 16*sizeof(char));
 }
 /**
  * @}

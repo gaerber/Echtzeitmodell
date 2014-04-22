@@ -16,21 +16,26 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 /* RTOS */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 
+
 /* BSP */
 #include "bsp_led.h"
 #include "bsp_gp22.h"
+
 
 /* application */
 #include "inc/Systemstate.h"
 #include "inc/TaskCommunicationTX.h" /*!< dependency for message queue */
 #include "inc/TaskController.h"
 
+
 /* private typedef -----------------------------------------------------------*/
+
 
 /**
  * \brief extracted parameters from the string-message
@@ -45,10 +50,13 @@ typedef union
 	uint8_t error; /*!< error ID's, \see TaskController.h */
 } command_param_t;
 
+
 /**
  * \brief function for the filter result
  */
 typedef void (*command_exe_t)(command_param_t*);
+
+
 
 
 /**
@@ -61,10 +69,13 @@ typedef struct
 }command_t;
 
 
+
+
 /*
  * \brief call function for the different filter-levels
  */
 typedef uint8_t (*msg_filter_t)(char**, void**, command_t*);
+
 
 /* private define ------------------------------------------------------------*/
 /* message filter patterns */
@@ -93,9 +104,12 @@ typedef uint8_t (*msg_filter_t)(char**, void**, command_t*);
 #define CMD_MESSAGE_NEW "new"
 
 
+
+
 /* private macro -------------------------------------------------------------*/
 /* private variables ---------------------------------------------------------*/
 QueueHandle_t gp_rx_message;
+
 
 /* private function prototypes -----------------------------------------------*/
 /* filter levels */
@@ -111,6 +125,7 @@ static uint8_t fourthLevelSetEngineSpdFilter(char**, void**, command_t*);
 static uint8_t fourthLevelSetStroboBrightFilter(char**, void**, command_t*);
 static uint8_t fourthLevelSetMessageNewFilter(char**, void**, command_t*);
 
+
 /* handlers */
 static void handlerError(command_param_t*);
 static void handlerEcho(command_param_t*);
@@ -119,8 +134,11 @@ static void handlerSpd(command_param_t*);
 static void handlerBright(command_param_t*);
 static void handlerMessage(command_param_t*);
 
+
 /* plot ACK message */
 static void printACK(void);
+
+
 
 
 /* private functions ---------------------------------------------------------*/
@@ -139,11 +157,13 @@ static void taskController(void* pvParameters)
 	msg_filter_t filter_handler;
 	uint8_t next_level;
 
+
 	/* endless loop */
 	for(;;)
 	{
 		/* set first filter stage */
 		filter_handler = firstLevelFilter;
+
 
 		/* wait until a message is received */
 		if(xQueueReceive(gp_rx_message,rx_message,portMAX_DELAY) == pdTRUE)
@@ -161,10 +181,13 @@ static void taskController(void* pvParameters)
 					start_ptr++;
 				}
 
+
 				/* filtering of the current filter stage */
 				next_level = filter_handler(&start_ptr,(void**)(&filter_handler), &command_handler);
 			}
 			while(next_level);
+
+
 
 
 //			if(*rx_message != '\0')
@@ -173,13 +196,18 @@ static void taskController(void* pvParameters)
 				command_handler.func(&command_handler.param);
 //			}
 
+
 		}
+
 
 	}
 }
 
 
+
+
 /* public functions ----------------------------------------------------------*/
+
 
 /**
  * \fn		taskControllerInit
@@ -191,15 +219,16 @@ void taskControllerInit()
 	xTaskCreate(taskController, CONTROLLER_TASK_NAME,
 			CONTROLLER_TASK_STACK_SIZE, NULL, CONTROLLER_TASK_PRIORITY, NULL );
 
+
 	/* create queue with MESSAGES_MAX_LENGTH char space per item */
 	gp_rx_message = xQueueCreate(CONTROLLER_QUEUE_LENGHT, sizeof(char[MESSAGES_MAX_LENGTH]));
 
+
 	/* init modules */
 	bsp_LedInit();
-	bsp_GP22Init();
-
-	bsp_GP22SendOpcode(0xFF);
 }
+
+
 
 
 /**
@@ -220,11 +249,13 @@ static uint8_t checkCommand(char*** msg, const char* cmd, uint8_t len)
 	char msg_tmp;
 	char cmd_tmp;
 
+
 	/* compare every letter */
 	for(i=0; i<len-1; i++)
 	{
 		cmd_tmp = *(cmd+i);
 		msg_tmp = *(*(*(msg))+i);
+
 
 		if(cmd_tmp != msg_tmp)
 		{
@@ -232,11 +263,15 @@ static uint8_t checkCommand(char*** msg, const char* cmd, uint8_t len)
 		}
 	}
 
+
 	/* adjust message pointer for pointing to next space ' ' */
 	*(*msg) = *(*(msg))+i;
 
+
 	return next_level;
 }
+
+
 
 
 /**
@@ -253,11 +288,13 @@ static uint8_t firstLevelFilter(char** msg, void** level_func, command_t* comman
 	uint8_t next_level;
 	const char set_msg[] = CMD_SET;
 
+
 	switch(*(*msg))
 	{
 	case CMD_SET_INITIAL:
 		/* check "set" string */
 		next_level = checkCommand(&msg, set_msg, sizeof(set_msg));
+
 
 		if(next_level)
 		{
@@ -265,10 +302,12 @@ static uint8_t firstLevelFilter(char** msg, void** level_func, command_t* comman
 		}
 		break;
 
+
 	/* unknown command */
 	default:
 		next_level = 0;
 	}
+
 
 	/* set error */
 	if(!next_level)
@@ -277,8 +316,11 @@ static uint8_t firstLevelFilter(char** msg, void** level_func, command_t* comman
 		command->func = handlerError;
 	}
 
+
 	return next_level;
 }
+
+
 
 
 /**
@@ -298,11 +340,13 @@ static uint8_t secondLevelSetFilter(char** msg, void** level_func, command_t* co
 	const char strobo_msg[] = CMD_STROBO;
 	const char message_msg[] = CMD_MESSAGE;
 
+
 	switch(*(*msg))
 	{
 	case CMD_COMM_INITIAL:
 		/* check "comm" string */
 		next_level = checkCommand(&msg, comm_msg, sizeof(comm_msg));
+
 
 		if(next_level)
 		{
@@ -310,44 +354,56 @@ static uint8_t secondLevelSetFilter(char** msg, void** level_func, command_t* co
 		}
 		break;
 
+
 	case CMD_ENGINE_INITIAL:
 		/* check "engine" string */
 		next_level = checkCommand(&msg, engine_msg, sizeof(engine_msg));
+
 
 		if(next_level)
 		{
 			*level_func = (void*)thirdLevelSetEngineFilter;
 		}
 
+
 		break;
+
 
 	case CMD_STROBO_INITIAL:
 		/* check "strobo" string */
 		next_level = checkCommand(&msg, strobo_msg, sizeof(strobo_msg));
+
 
 		if(next_level)
 		{
 			*level_func = (void*)thirdLevelSetStroboFilter;
 		}
 
+
 		break;
+
 
 	case CMD_MESSAGE_INITIAL:
 		/* check "message" string */
 		next_level = checkCommand(&msg, message_msg, sizeof(message_msg));
+
 
 		if(next_level)
 		{
 			*level_func = (void*)thirdLevelSetMessageFilter;
 		}
 
+
 		break;
+
+
 
 
 	/* unknown command */
 	default:
 		next_level = 0;
 	}
+
 
 	/* set error */
 	if(!next_level)
@@ -356,8 +412,11 @@ static uint8_t secondLevelSetFilter(char** msg, void** level_func, command_t* co
 		command->func = handlerError;
 	}
 
+
 	return next_level;
 }
+
+
 
 
 /**
@@ -375,11 +434,13 @@ static uint8_t thirdLevelSetCommFilter(char** msg, void** level_func, command_t*
 	const char comm_echo_msg[] = CMD_COMM_ECHO;
 	const char comm_respmsg_msg[] = CMD_COMM_RESPMSG;
 
+
 	switch(*(*msg))
 	{
 	case CMD_COMM_ECHO_INITIAL:
 		/* check "echo" string */
 		next_level = checkCommand(&msg, comm_echo_msg, sizeof(comm_echo_msg));
+
 
 		if(next_level)
 		{
@@ -387,21 +448,26 @@ static uint8_t thirdLevelSetCommFilter(char** msg, void** level_func, command_t*
 		}
 		break;
 
+
 	case CMD_COMM_RESPMSG_INITIAL:
 		/* check "response" string */
 		next_level = checkCommand(&msg, comm_respmsg_msg, sizeof(comm_respmsg_msg));
+
 
 		if(next_level)
 		{
 			*level_func = (void*)fourthLevelSetCommRespmsgFilter;
 		}
 
+
 		break;
+
 
 	/* unknown command */
 	default:
 		next_level = 0;
 	}
+
 
 	/* set error */
 	if(!next_level)
@@ -419,8 +485,11 @@ static uint8_t thirdLevelSetCommFilter(char** msg, void** level_func, command_t*
 		}
 	}
 
+
 	return next_level;
 }
+
+
 
 
 /**
@@ -437,11 +506,13 @@ static uint8_t thirdLevelSetEngineFilter(char** msg, void** level_func, command_
 	uint8_t next_level;
 	const char engine_spd_msg[] = CMD_ENGINE_SPD;
 
+
 	switch(*(*msg))
 	{
 	case CMD_ENGINE_SPD_INITIAL:
 		/* check "speed" string */
 		next_level = checkCommand(&msg, engine_spd_msg, sizeof(engine_spd_msg));
+
 
 		if(next_level)
 		{
@@ -449,10 +520,12 @@ static uint8_t thirdLevelSetEngineFilter(char** msg, void** level_func, command_
 		}
 		break;
 
+
 	/* unknown command */
 	default:
 		next_level = 0;
 	}
+
 
 	/* set error */
 	if(!next_level)
@@ -470,8 +543,11 @@ static uint8_t thirdLevelSetEngineFilter(char** msg, void** level_func, command_
 		}
 	}
 
+
 	return next_level;
 }
+
+
 
 
 /**
@@ -488,11 +564,13 @@ static uint8_t thirdLevelSetStroboFilter(char** msg, void** level_func, command_
 	uint8_t next_level;
 	const char strobo_bright_msg[] = CMD_STROBO_BRIGHT;
 
+
 	switch(*(*msg))
 	{
 	case CMD_STROBO_BRIGHT_INITIAL:
 		/* check "brightness" string */
 		next_level = checkCommand(&msg, strobo_bright_msg, sizeof(strobo_bright_msg));
+
 
 		if(next_level)
 		{
@@ -500,10 +578,12 @@ static uint8_t thirdLevelSetStroboFilter(char** msg, void** level_func, command_
 		}
 		break;
 
+
 	/* unknown command */
 	default:
 		next_level = 0;
 	}
+
 
 	/* set error */
 	if(!next_level)
@@ -521,8 +601,11 @@ static uint8_t thirdLevelSetStroboFilter(char** msg, void** level_func, command_
 		}
 	}
 
+
 	return next_level;
 }
+
+
 
 
 /**
@@ -539,11 +622,13 @@ static uint8_t thirdLevelSetMessageFilter(char** msg, void** level_func, command
 	uint8_t next_level;
 	const char message_new_msg[] = CMD_MESSAGE_NEW;
 
+
 	switch(*(*msg))
 	{
 	case CMD_MESSAGE_NEW_INITIAL:
 		/* check "new" string */
 		next_level = checkCommand(&msg, message_new_msg, sizeof(message_new_msg));
+
 
 		if(next_level)
 		{
@@ -551,10 +636,12 @@ static uint8_t thirdLevelSetMessageFilter(char** msg, void** level_func, command
 		}
 		break;
 
+
 	/* unknown command */
 	default:
 		next_level = 0;
 	}
+
 
 	/* set error */
 	if(!next_level)
@@ -572,8 +659,10 @@ static uint8_t thirdLevelSetMessageFilter(char** msg, void** level_func, command
 		}
 	}
 
+
 	return next_level;
 }
+
 
 /**
  * \fn		fourthLevelSetCommEchoFilter
@@ -613,9 +702,12 @@ static uint8_t fourthLevelSetCommEchoFilter(char** msg, void** level_func, comma
 		command->func = handlerError;
 	}
 
+
 	/* end of filtering */
 	return 0;
 }
+
+
 
 
 /**
@@ -656,9 +748,12 @@ static uint8_t fourthLevelSetCommRespmsgFilter(char** msg, void** level_func, co
 		command->func = handlerError;
 	}
 
+
 	/* end of filtering */
 	return 0;
 }
+
+
 
 
 /**
@@ -674,11 +769,13 @@ static uint8_t fourthLevelSetEngineSpdFilter(char** msg, void** level_func, comm
 	/* local variables */
 	uint16_t speed_value = 0;
 
+
 	/* check if the parameter is a number */
 	if(**msg >= '0' && **msg <= '9')
 	{
 		/* convert ascii to int */
 		speed_value = atoi(*msg);
+
 
 		/* check if value within the bounds */
 		if(speed_value > 0 && speed_value <= 100)
@@ -700,9 +797,12 @@ static uint8_t fourthLevelSetEngineSpdFilter(char** msg, void** level_func, comm
 		command->func = handlerError;
 	}
 
+
 	/* end of filtering */
 	return 0;
 }
+
+
 
 
 /**
@@ -718,11 +818,13 @@ static uint8_t fourthLevelSetStroboBrightFilter(char** msg, void** level_func, c
 	/* local variables */
 	uint16_t bright_value = 0;
 
+
 	/* check if the parameter is a number */
 	if(**msg >= '0' && **msg <= '9')
 	{
 		/* convert ascii to int */
 		bright_value = atoi(*msg);
+
 
 		/* check if value within the bounds */
 		if(bright_value > 0 && bright_value <= 100)
@@ -744,9 +846,12 @@ static uint8_t fourthLevelSetStroboBrightFilter(char** msg, void** level_func, c
 		command->func = handlerError;
 	}
 
+
 	/* end of filtering */
 	return 0;
 }
+
+
 
 
 /**
@@ -774,9 +879,12 @@ static uint8_t fourthLevelSetMessageNewFilter(char** msg, void** level_func, com
 		command->func = handlerError;
 	}
 
+
 	/* end of filtering */
 	return 0;
 }
+
+
 
 
 /**
@@ -793,6 +901,7 @@ static void handlerError(command_param_t* param)
 	const char error_fault[] = ERROR_FAULT_ARG_TYP_STR_CODE" " ERROR_FAULT_ARG_TYP_MSG"\r\n";
 	const char error_bound[] = ERROR_ARG_OUT_OF_BND_STR_CODE" " ERROR_ARG_OUT_OF_BND_MSG"\r\n";
 
+
 	switch(param->error)
 	{
 	case ERROR_UNKNOW_CMD_CODE:
@@ -800,21 +909,25 @@ static void handlerError(command_param_t* param)
 		else {xQueueSend(gq_tx_message,ERROR_UNKNOW_CMD_MSG,portMAX_DELAY);}
 		break;
 
+
 	case ERROR_TOO_FEW_ARG_CODE:
 		if(g_systemstate.comm_respmsg){xQueueSend(gq_tx_message,error_few,portMAX_DELAY);}
 		else {xQueueSend(gq_tx_message,ERROR_TOO_FEW_ARG_MSG,portMAX_DELAY);}
 		break;
+
 
 	case ERROR_FAULT_ARG_TYP_CODE:
 		if(g_systemstate.comm_respmsg){xQueueSend(gq_tx_message,error_fault,portMAX_DELAY);}
 		else {xQueueSend(gq_tx_message,ERROR_FAULT_ARG_TYP_MSG,portMAX_DELAY);}
 		break;
 
+
 	case ERROR_ARG_OUT_OF_BND_CODE:
 		if(g_systemstate.comm_respmsg){xQueueSend(gq_tx_message,error_bound,portMAX_DELAY);}
 		else {xQueueSend(gq_tx_message,ERROR_ARG_OUT_OF_BND_MSG,portMAX_DELAY);}
 	}
 }
+
 
 /**
  * \fn		handlerEcho
@@ -827,8 +940,11 @@ static void handlerEcho(command_param_t* param)
 	/* set system state */
 	g_systemstate.comm_echo = param->echo;
 
+
 	printACK();
 }
+
+
 
 
 /**
@@ -842,8 +958,10 @@ static void handlerRespmsg(command_param_t* param)
 	/* set system state */
 	g_systemstate.comm_respmsg = param->respmsg;
 
+
 	printACK();
 }
+
 
 /**
  * \fn		handlerSpd
@@ -856,8 +974,10 @@ static void handlerSpd(command_param_t* param)
 	/* set system state */
 	g_systemstate.speed = param->speed;
 
+
 	printACK();
 }
+
 
 /**
  * \fn		handlerBright
@@ -870,8 +990,11 @@ static void handlerBright(command_param_t* param)
 	/* set system state */
 	g_systemstate.flash_time = param->brightness;
 
+
 	printACK();
 }
+
+
 
 
 /**
@@ -887,8 +1010,11 @@ static void handlerMessage(command_param_t* param)
 	/* set system state */
 	strcpy(g_systemstate.message,param->new);
 
+
 	printACK();
 }
+
+
 
 
 /**
@@ -899,6 +1025,7 @@ static void printACK(void)
 {
 	/* local variable */
 	const char str[] = ERROR_ACK_STR_CODE" " ERROR_ACK_MSG"\r\n";
+
 
 	/* print response (full or only message without ID */
 	if(g_systemstate.comm_respmsg)
@@ -911,7 +1038,7 @@ static void printACK(void)
 	}
 }
 
+
 /**
  * @}
  */
-
