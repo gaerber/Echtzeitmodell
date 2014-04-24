@@ -3,7 +3,7 @@
  * \brief       Angel encoder. Supports the GPIO interrupts of the incremental of
  * 				the rotation axe of the engine.
  * \date        2014-03-18
- * \version     0.1
+ * \version     0.2
  * \author		Kevin Gerber
  *
  * \addtogroup  bsp
@@ -22,14 +22,20 @@
 #include "bsp.h"
 
 /** Hardware label from the interrupt input of the incremental A (Carme IO2 IN1) */
-static const bsp_gpioconf_t BSP_ANGENC_INCA = {RCC_AHB1Periph_GPIOG, GPIOG, GPIO_Pin_6};
+static const bsp_gpioconf_t BSP_ANGENC_INCA = {
+		RCC_AHB1Periph_GPIOG, GPIOG, GPIO_Pin_6, GPIO_Mode_IN, GPIO_PuPd_NOPULL
+};
 //static const bsp_gpioconf_t BSP_ANGENC_INCA = {RCC_AHB1Periph_GPIOC, GPIOC, GPIO_Pin_7};
 
 /** Hardware label from the interrupt input of the incremental B (Carme IO2 IN2) */
-static const bsp_gpioconf_t BSP_ANGENC_INCB = {RCC_AHB1Periph_GPIOG, GPIOG, GPIO_Pin_7};
+static const bsp_gpioconf_t BSP_ANGENC_INCB = {
+		RCC_AHB1Periph_GPIOG, GPIOG, GPIO_Pin_7, GPIO_Mode_IN, GPIO_PuPd_NOPULL
+};
 
 /** Hardware label from the interrupt input of the incremental index (Carme IO2 IN0) */
-static const bsp_gpioconf_t BSP_ANGENC_INCI = {RCC_AHB1Periph_GPIOG, GPIOG, GPIO_Pin_8};
+static const bsp_gpioconf_t BSP_ANGENC_INCI = {
+		RCC_AHB1Periph_GPIOG, GPIOG, GPIO_Pin_8, GPIO_Mode_IN, GPIO_PuPd_NOPULL
+};
 
 /* Interrupt settings */
 #define BSP_ARGENC_IRQ_CHANEL	EXTI9_5_IRQn		/*!< NVIC UART interrupt */
@@ -38,6 +44,7 @@ static const bsp_gpioconf_t BSP_ANGENC_INCI = {RCC_AHB1Periph_GPIOG, GPIOG, GPIO
 
 /* Function prototypes */
 extern void bsp_AngEncInit(void);
+extern void bsp_AngEncPos(uint32_t pos);
 
 #endif /* BSP_ANGENC_H_ */
 

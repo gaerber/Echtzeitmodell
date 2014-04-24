@@ -21,14 +21,16 @@
 #ifndef BSP_SERIAL_H_
 #define BSP_SERIAL_H_
 
+#include "bsp.h"
+
 /** Hardware label from the UART RX pin */
 static const bsp_gpioconf_t BSP_SERIAL_RX = {
-		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_10, GPIO_AF_USART1
+		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_10, GPIO_Mode_AF, GPIO_PuPd_UP, GPIO_AF_USART1
 };
 
 /** Hardware label from the UART TX pin */
 static const bsp_gpioconf_t BSP_SERIAL_TX = {
-		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_9, GPIO_AF_USART1
+		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_9, GPIO_Mode_AF, GPIO_PuPd_UP, GPIO_AF_USART1
 };
 
 #define BSP_SERIAL_PORT			USART1					/*!< Port base address of the UART port */
@@ -40,7 +42,7 @@ static const bsp_gpioconf_t BSP_SERIAL_TX = {
 
 /* UART settings */
 #define BSP_SERIAL_UART_BAUD	115200				/*!< UART baud */
-#define BSP_SERIAL_UART_LENGTH	USART_WordLength_8b	/*!< UART word lngth */
+#define BSP_SERIAL_UART_LENGTH	USART_WordLength_8b	/*!< UART word length */
 #define BSP_SERIAL_UART_STOP	USART_StopBits_1	/*!< UART number of stop bits */
 #define BSP_SERIAL_UART_PARITY	USART_Parity_No		/*!< UART parity bit */
 #define BSP_SERIAL_UART_FLOW	USART_HardwareFlowControl_None	/*!< UART hardware flow control */
@@ -49,8 +51,8 @@ static const bsp_gpioconf_t BSP_SERIAL_TX = {
 extern void bsp_SerialInit(void);
 extern void bsp_SerialSend(uint16_t data);
 extern void bsp_SerialReceive(uint16_t *data);
-extern void bspSerialTxIrqEnable(void);
-extern void bspSerialTxIrqDisable(void);
+extern void bsp_SerialTxIrqEnable(void);
+extern void bsp_SerialTxIrqDisable(void);
 
 #endif /* BSP_SERIAL_H_ */
 

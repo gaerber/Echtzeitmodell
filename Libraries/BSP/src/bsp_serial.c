@@ -19,8 +19,8 @@ extern void bsp_SerialIrqTxHandler(void);
 extern void bsp_SerialIrqRxHandler(void);
 
 /**
-  * \brief	This function handles USARTx global interrupt request.
-  */
+ * \brief	This function handles USARTx global interrupt request.
+ */
 void BSP_SERIAL_IRQ_Handler(void) {
 	/* UART receive data register not empty */
 	if(USART_GetITStatus(BSP_SERIAL_PORT, USART_IT_RXNE) != RESET) {
@@ -45,30 +45,12 @@ void BSP_SERIAL_IRQ_Handler(void) {
  * \TODO	Check if USART_Cmd() is necessary.
  */
 void bsp_SerialInit(void) {
-	uint32_t i;
-	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 
-	const bsp_gpioconf_t *port[2] = {&BSP_SERIAL_RX, &BSP_SERIAL_TX};
-
-	/* Initialize the GPIOs as inputs. */
-	for (i=0; i < 2; i++) {
-		/* GPIO Peripheral clock enable */
-		RCC_AHB1PeriphClockCmd(port[i]->periph, ENABLE);
-
-		/* GPIO Configuration in alternate function mode */
-		GPIO_InitStructure.GPIO_Pin = port[i]->pin;
-		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-		GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-		GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
-		GPIO_Init(port[i]->base, &GPIO_InitStructure);
-
-		/* Connect the alternate function to the pin */
-		GPIO_PinAFConfig(port[i]->base,
-				BSP_GPIO_PIN_TO_SOURCE(port[i]->pin), port[i]->af);
-	}
+	/* Initialize all GPIOs in their function */
+	bsg_GpioInit(&BSP_SERIAL_RX);
+	bsg_GpioInit(&BSP_SERIAL_TX);
 
 	/* UART Peripheral clock enable */
 	if (BSP_SERIAL_PERIPH == RCC_APB2Periph_USART1 || BSP_SERIAL_PERIPH == RCC_APB2Periph_USART6) {
@@ -130,7 +112,7 @@ void bsp_SerialReceive(uint16_t *data) {
  * \brief	Enable the TX interrupt.
  * 			This function is used, if chars are available to send.
  */
-void bspSerialTxIrqEnable(void) {
+void bsp_SerialTxIrqEnable(void) {
 	USART_ITConfig(BSP_SERIAL_PORT, USART_IT_TXE, ENABLE);
 }
 
@@ -138,7 +120,7 @@ void bspSerialTxIrqEnable(void) {
  * \brief	Disable the TX interrupt.
  * 			This function is used, if no sending chars are available.
  */
-void bspSerialTxIrqDisable(void) {
+void bsp_SerialTxIrqDisable(void) {
 	USART_ITConfig(BSP_SERIAL_PORT, USART_IT_TXE, DISABLE);
 }
 

@@ -31,20 +31,23 @@ typedef enum {
 /** PWM frequency */
 #define BSP_ENGINE_PWM_FREQ				21000000
 /** Period register of the PWM. */
-#define BSP_ENGINE_PWM_PERIOD			665
+#define BSP_ENGINE_PWM_PERIOD			101
 
 /** RCC AHB peripheral of the timer port. */
 #define BSP_ENGINE_TIMER_PORT_PERIPH	RCC_APB1Periph_TIM5
 /** Port base address of the timer port */
 #define BSP_ENGINE_TIMER_PORT_BASE		TIM5
 /** Used PWM type */
-#define BSP_ENGINE_PWM_PORT_CHANEL		CHANEL1
+#define BSP_ENGINE_PWM_PORT_CHANEL		CHANEL4
 
 /** Hardware label of the PWM output pin, which is connected to the engine. */
 static const bsp_gpioconf_t BSP_ENGINE_PORT = {
-		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_0, GPIO_AF_TIM5
+		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_3, GPIO_Mode_AF, GPIO_PuPd_NOPULL, GPIO_AF_TIM5
 };
 
+///\note This is the GPIO for the flash light!
+///		RCC_AHB1Periph_GPIOA, GPIOA, GPIO_Pin_0, GPIO_Mode_AF, GPIO_PuPd_NOPULL, GPIO_AF_TIM5
+///		#define BSP_ENGINE_PWM_PORT_CHANEL		CHANEL1
 /* Function prototypes */
 extern void bsp_EngineInit(void);
 extern void bsp_EngineEnalble(void);
