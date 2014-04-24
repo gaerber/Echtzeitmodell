@@ -1,20 +1,37 @@
 /**
  * \file        bsp_spi.h
  * \brief       Supports the SPI for the communication with the TDC GP22.
- * \date        2014-04-15
- * \version     0.1
+ * \date        2014-04-24
+ * \version     0.2
  * \author		Kevin Gerber
  *
  * \addtogroup  bsp
  * @{
  *
  * \addtogroup  bsp_spi
- * \brief		Supports all functions for the communication with the TDC GP22.
+ * \brief		Supports all functions for the communication with the SPI interface.
+ * 				It supports multiple chips over the same SPI interface. The controller
+ * 				works as a master.
  * @{
  */
 
 #ifndef BSP_SPI_H_
 #define BSP_SPI_H_
+
+/**
+ * \typedef	bsp_spicallback_t
+ * \brief	Interrupt callback function to manage the received data.
+ */
+typedef void (*bsp_spicallback_t)(uint8_t *rx_data, uint8_t size);
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * Buffer configurations
+ * ----------------------------------------------------------------------------
+ */
+#define BSP_SPI_BUFSIZE_DATA		5			/*!< Maximum number of bytes of a transmission. */
+#define BSP_SPI_BUFFER_LEN			(1<<4)		/*!< Transmission buffer size */
 
 
 /*
@@ -24,11 +41,12 @@
  */
 
 /**
- * \brief		List off all LEDs to use in software.
- * \important	All LEDs require an entry in the \var port_led array with the correct hardware labels.
+ * \brief		List off all chip selects, which are supported by the SPI interface.
+ * \important	All chip selects require an entry in the \var BSP_SPI_CS array with
+ * 				the correct hardware labels.
  */
 typedef enum {
-	BSP_SPI_CS_GP22 = 0,	/*!< The green LED identification number. */
+	BSP_SPI_CS_CPLD = 0,	/*!< Chip select from the external CPLD. */
 	BSP_SPI_CS_ELEMENTCTR	/*!< Counts the chip selects. It must be the last element. */
 } bsp_spics_t;
 
@@ -61,56 +79,10 @@ static const bsp_gpioconf_t BSP_SPI_PORT_LABEL[] = {
 
 /*
  * ----------------------------------------------------------------------------
- * Interrupt buffer
- * ----------------------------------------------------------------------------
- */
-#define BSP_SPI_BUFSIZE_DATA		5
-#define BSP_SPI_BUFFER_LEN			(1<<4)
-
-/**
- * \typedef	bsp_spicallback_t
- * \brief	Interrupt callback function to manage the received data.
- */
-typedef void (*bsp_spicallback_t)(uint8_t *rx_data, uint8_t size);
-
-/**
- * \brief	SPI transfer element.
- * \note	A static data type.
- */
-typedef struct {
-	bsp_spicallback_t callback;
-	uint8_t data[BSP_SPI_BUFSIZE_DATA];
-	uint8_t size;
-	uint8_t send_ptr;
-	uint8_t receive_prt;
-	bsp_spics_t chip;
-} spitrans_t;
-
-/**
- * \brief	Circular buffer structure.
- * \note	Should be a static data type!
- */
-typedef struct {
-	uint32_t read;				/*!< TX buffer start index (reading) */
-	uint32_t write;				/*!< TX Buffer end index (writing) */
-	spitrans_t buffer[BSP_SPI_BUFFER_LEN];	/*!< SPI buffer storage */
-	uint8_t sending;;			/*!< TX transmission is pending */
-} spi_circbuff_t;
-
-
-/*
- * ----------------------------------------------------------------------------
  * Prototypes
  * ----------------------------------------------------------------------------
  */
 extern void bsp_SPIInit(void);
-extern void bsp_SPIChipSelect(bsp_spics_t chip);
-extern void bsp_SPIChipDeselect(bsp_spics_t chip);
-extern void bsp_SPISend(uint16_t data);
-extern void bsp_SPIReceive(uint16_t *data);
-extern void bsp_SPITxIrqEnable(void);
-extern void bsp_SPITxIrqDisable(void);
-
 extern uint8_t bsp_SPITransmit(bsp_spics_t chip, uint8_t *data, uint8_t len, bsp_spicallback_t calback);
 
 #endif /* BSP_GP22_H_ */

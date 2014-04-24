@@ -68,41 +68,13 @@ typedef enum {
 #define BSP_GP22_REG5		0x10000000
 #define BSP_GP22_REG6		0x00000000
 
-/*
- * ----------------------------------------------------------------------------
- * Structures
- * ----------------------------------------------------------------------------
- */
-
-typedef struct {
-	void (*irq_callback_handler)(uint32_t);
-	uint8_t data[4];
-	uint8_t size;
-	uint8_t send_ptr;
-	uint8_t receive_prt;
-	uint8_t pending;
-} simple_t;
-
-typedef struct {
-	uint32_t write;
-	uint32_t read;
-	simple_t buffer[16];
-	uint8_t sending;
-} spi_cricbuf_t;
-
-#define SPI_BUFFER_LEN 16
 
 /*
  * ----------------------------------------------------------------------------
- * Prototyps
+ * Prototypes
  * ----------------------------------------------------------------------------
  */
-extern void bsp_GP22Init(void);
-extern uint8_t bsp_GP22RegWirte(uint8_t opcode, uint32_t data);
-extern uint8_t bsp_GP22SendOpcode(uint8_t opcode);
-extern uint8_t bsp_GP22ReadBlocked(uint8_t opcode, uint8_t *data, uint8_t bytes_ctr);
-extern uint8_t bsp_GP22ReadIrqCallback(uint8_t opcode, uint8_t bytes_ctr,
-		void (*irq_callback_handler)(uint32_t) );
+
 
 #endif /* BSP_GP22_H_ */
 

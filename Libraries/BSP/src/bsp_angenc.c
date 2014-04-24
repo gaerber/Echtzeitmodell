@@ -25,7 +25,7 @@
  */
 
 static uint32_t g_angle;
-static uint32_t g_angle_capture = 1;
+static uint32_t g_angle_capture = 0;
 
 void BSP_ARGENC_IRQ_Handler(void) {
     /* Incremental A GPIO rising edge interrupt */
@@ -33,10 +33,8 @@ void BSP_ARGENC_IRQ_Handler(void) {
         EXTI_ClearITPendingBit(BSP_ANGENC_INCA.pin);
         g_angle++;
         if (g_angle == g_angle_capture) {
-        	uint32_t i;
         	/* Trigger the strobo */
             bsp_LedSetOn(BSP_LED_STROBE);
-            for (i=0; i<0x5F; i++);
             bsp_LedSetOff(BSP_LED_STROBE);
         }
     }
