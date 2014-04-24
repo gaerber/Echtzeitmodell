@@ -19,7 +19,7 @@ typedef struct
 {
 	char message[16];		/*!< rx message*/
 	uint8_t speed;			/*!< motor speed from 0...100%*/
-	uint16_t flash_time;	/*!< */
+	uint8_t flash_time;	/*!< */
 	uint8_t comm_echo;
 	uint8_t comm_respmsg;
 }systemstate_t;

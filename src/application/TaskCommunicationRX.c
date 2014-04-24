@@ -58,8 +58,10 @@ static void taskCommunicationRX(void* pvParameters)
 			if (CircularBufferCharGet(&(command[write_index]))) {
 				/* Character echo */
 				if (g_systemstate.comm_echo) {
-					/* Receive data */
-					xSemaphoreTake(gm_tx_rinbuffer, portMAX_DELAY);
+					if(write_index == 0) {
+						/* Receive data */
+						xSemaphoreTake(gm_tx_rinbuffer, portMAX_DELAY);
+					}
 					/* Puts the echo */
 					while (!CircularBufferCharPut(command[write_index])) {
 						vTaskDelay(10/portTICK_RATE_MS);
@@ -87,7 +89,8 @@ static void taskCommunicationRX(void* pvParameters)
 					else {
 						/* Command overflow detected */
 						write_index = 0;
-						xQueueSend(gq_tx_message, "#Command overflow", portMAX_DELAY);
+						xSemaphoreGive(gm_tx_rinbuffer);
+						xQueueSend(gq_tx_message, "\r\n#Command overflow\r\n", portMAX_DELAY);
 					}
 				}
 			}

@@ -87,6 +87,10 @@ void taskCommunicationTXInit()
 	/* create mutex */
 	gm_tx_rinbuffer = xSemaphoreCreateMutex();
 	xSemaphoreGive(gm_tx_rinbuffer);
+	vQueueAddToRegistry(gm_tx_rinbuffer, "tx_ringbuffer");
+
+	/* Send hello text */
+	CircularBufferStringPut("Welcome\r\n", 9);
 }
 
 

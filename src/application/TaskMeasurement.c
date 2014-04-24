@@ -37,6 +37,11 @@ QueueHandle_t gq_message;
 uint32_t convertChar2Pos(char c) {
 	uint32_t pos;
 
+	/* convert capital letters to small letters */
+	if ( c >= 'A' && c <= 'Z') {
+		c = c | 0x20;
+	}
+
 	if (c >= 'a' && c <= 'z') {
 		pos = c - 'a' + 1;
 	}
@@ -82,7 +87,7 @@ uint32_t convertChar2Pos(char c) {
  */
 static void taskMeasurement(void* pvParameters)
 {
-	uint32_t letter;
+	uint32_t letter = 0;
 	uint32_t letter_pos;
 	char message[16];
 
@@ -100,7 +105,10 @@ static void taskMeasurement(void* pvParameters)
 		}
 
 		/* Short delay in front of each string */
-		vTaskDelay(600);
+		if (letter == 0) {
+			bsp_AngEncPos(0);
+			vTaskDelay(550);
+		}
 
 		/* Show the next char */
 		letter_pos = convertChar2Pos(message[letter]);
@@ -112,7 +120,8 @@ static void taskMeasurement(void* pvParameters)
 		vTaskDelay(500);
 
 		/* Make a Short break with a empty screen */
-		vTaskDelay(100);
+		bsp_AngEncPos(0);
+		vTaskDelay(50);
 
 		/* Next letter */
 		letter++;
@@ -133,7 +142,7 @@ void taskMeasurementInit()
 			MEASUREMENT_TASK_STACK_SIZE, NULL, MEASUREMENT_TASK_PRIORITY, NULL );
 
 	/* create queue per item */
-	gq_message = xQueueCreate(MEASUREMENT_QUEUE_LENGTH, 16*sizeof(char));
+	gq_message = xQueueCreate(MEASUREMENT_QUEUE_LENGTH, sizeof(char[16]));
 }
 /**
  * @}
