@@ -4,8 +4,6 @@
  * \date        2014-03-31
  * \version     0.0.1
  *
- * \todo		POINTER PROBLEME
- *
  * \addtogroup  controller
  * \brief       controls the system flow
  * @{
@@ -411,12 +409,12 @@ static uint8_t thirdLevelSetCommFilter(char** msg, void** level_func, command_t*
 	if(!next_level)
 	{
 		/* no parameter aviable */
-		if(**msg == '\0')
-		{
-			command->param.error = ERROR_TOO_FEW_ARG_CODE;
-			command->func = handlerError;
-		}
-		else
+//		if(**msg == '\0')
+//		{
+//			command->param.error = ERROR_TOO_FEW_ARG_CODE;
+//			command->func = handlerError;
+//		}
+//		else
 		{
 			command->param.error = ERROR_UNKNOW_CMD_CODE;
 			command->func = handlerError;
@@ -462,12 +460,12 @@ static uint8_t thirdLevelSetEngineFilter(char** msg, void** level_func, command_
 	if(!next_level)
 	{
 		/* no parameter aviable */
-		if(**msg == '\0')
-		{
-			command->param.error = ERROR_TOO_FEW_ARG_CODE;
-			command->func = handlerError;
-		}
-		else
+//		if(**msg == '\0')
+//		{
+//			command->param.error = ERROR_TOO_FEW_ARG_CODE;
+//			command->func = handlerError;
+//		}
+//		else
 		{
 			command->param.error = ERROR_UNKNOW_CMD_CODE;
 			command->func = handlerError;
@@ -513,12 +511,12 @@ static uint8_t thirdLevelSetStroboFilter(char** msg, void** level_func, command_
 	if(!next_level)
 	{
 		/* no parameter aviable */
-		if(**msg == '\0')
-		{
-			command->param.error = ERROR_TOO_FEW_ARG_CODE;
-			command->func = handlerError;
-		}
-		else
+//		if(**msg == '\0')
+//		{
+//			command->param.error = ERROR_TOO_FEW_ARG_CODE;
+//			command->func = handlerError;
+//		}
+//		else
 		{
 			command->param.error = ERROR_UNKNOW_CMD_CODE;
 			command->func = handlerError;
@@ -760,13 +758,11 @@ static uint8_t fourthLevelSetStroboBrightFilter(char** msg, void** level_func, c
  * \param	msg	pointer to received message
  * \param	level_func pointer to next filter level
  * \param	command pointer to execute function
- *
- * \todo	test
  */
 static uint8_t fourthLevelSetMessageNewFilter(char** msg, void** level_func, command_t* command)
 {
 	/* check if the string isn't too long */
-	if(strlen(*msg) <= 16)
+	if(strlen(*msg) < 16)
 	{
 		command->func = handlerMessage;
 		strcpy(command->param.new,*msg);
@@ -801,22 +797,22 @@ static void handlerError(command_param_t* param)
 	{
 	case ERROR_UNKNOW_CMD_CODE:
 		if(g_systemstate.comm_respmsg){xQueueSend(gq_tx_message,error_unknow,portMAX_DELAY);}
-		else {xQueueSend(gq_tx_message,ERROR_UNKNOW_CMD_MSG,portMAX_DELAY);}
+		else {xQueueSend(gq_tx_message,ERROR_UNKNOW_CMD_MSG"\r\n",portMAX_DELAY);}
 		break;
 
 	case ERROR_TOO_FEW_ARG_CODE:
 		if(g_systemstate.comm_respmsg){xQueueSend(gq_tx_message,error_few,portMAX_DELAY);}
-		else {xQueueSend(gq_tx_message,ERROR_TOO_FEW_ARG_MSG,portMAX_DELAY);}
+		else {xQueueSend(gq_tx_message,ERROR_TOO_FEW_ARG_MSG"\r\n",portMAX_DELAY);}
 		break;
 
 	case ERROR_FAULT_ARG_TYP_CODE:
 		if(g_systemstate.comm_respmsg){xQueueSend(gq_tx_message,error_fault,portMAX_DELAY);}
-		else {xQueueSend(gq_tx_message,ERROR_FAULT_ARG_TYP_MSG,portMAX_DELAY);}
+		else {xQueueSend(gq_tx_message,ERROR_FAULT_ARG_TYP_MSG"\r\n",portMAX_DELAY);}
 		break;
 
 	case ERROR_ARG_OUT_OF_BND_CODE:
 		if(g_systemstate.comm_respmsg){xQueueSend(gq_tx_message,error_bound,portMAX_DELAY);}
-		else {xQueueSend(gq_tx_message,ERROR_ARG_OUT_OF_BND_MSG,portMAX_DELAY);}
+		else {xQueueSend(gq_tx_message,ERROR_ARG_OUT_OF_BND_MSG"\r\n",portMAX_DELAY);}
 	}
 }
 
@@ -828,8 +824,11 @@ static void handlerError(command_param_t* param)
  */
 static void handlerEcho(command_param_t* param)
 {
+	/* Acces from Task Communication RX -> Critical Section */
+	vPortEnterCritical();
 	/* set system state */
 	g_systemstate.comm_echo = param->echo;
+	vPortExitCritical();
 
 	printACK();
 }
@@ -843,6 +842,7 @@ static void handlerEcho(command_param_t* param)
  */
 static void handlerRespmsg(command_param_t* param)
 {
+	/* Access only in this task */
 	/* set system state */
 	g_systemstate.comm_respmsg = param->respmsg;
 
@@ -891,8 +891,6 @@ static void handlerBright(command_param_t* param)
  * \brief	set the new message
  *
  * \param	param	message string with 16 letters
- *
- * \todo 	test
  */
 static void handlerMessage(command_param_t* param)
 {

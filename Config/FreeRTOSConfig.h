@@ -94,7 +94,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_16_BIT_TICKS			    	0
 #define configIDLE_SHOULD_YIELD			    	1
 #define configUSE_MUTEXES				    	1
-#define configQUEUE_REGISTRY_SIZE			    0
+#define configQUEUE_REGISTRY_SIZE			    2 /* queue/semaphore monitoring */
 #define configUSE_RECURSIVE_MUTEXES			    1
 #define configUSE_APPLICATION_TASK_TAG	        0
 #define configUSE_COUNTING_SEMAPHORES	        1
